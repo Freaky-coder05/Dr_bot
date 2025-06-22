@@ -9,12 +9,12 @@ Password = "TOP123123" #Your password here
 # --- Telegram Settings ---
 API_ID = 25797857  # Replace with your API ID
 API_HASH = "77717127ece56fac64ebea6250db8bb7" # Replace with your API Hash
-BOT_TOKEN = "7848338633:AAFAjJaVi5tk6Tvj9NEl7MMd7zYNmFVwl84" # Replace with your Bot Token
+BOT_TOKEN = "7662286847:AAGJIoqoUHsHcoj4RD8fWJqUNFD-2hepQTY" # Replace with your Bot Token
 
 # --- User Management & Limits ---
 sudo_users = [6693549185] # List of sudo user IDs (as integers)
 premium_users = [] # List of premium user IDs (as integers)
-AUTHORIZED_USERS = [7177667220] # List of authorized user IDs to use bot in private (as integers)
+AUTHORIZED_USERS = [7177667220,6299192020] # List of authorized user IDs to use bot in private (as integers)
 
 # Limits for regular users
 REGULAR_USER_AUDIO_LIMIT = 5
@@ -50,9 +50,9 @@ y_axis = "(h-text_h)/2" # y-axis position of the watermark
 #ffmpeg settings
 use_watermark = False # Set to True to use watermark
 ffmpeg_path = "ffmpeg" # Path to ffmpeg executable
-encoding_code = "libx265" # Encoding method note: if watermark is enabled, use "libx264" for encoding
+encoding_code = "libx264" # Encoding method note: if watermark is enabled, use "libx264" for encoding
 output_format = "mkv" # Output format
-audio_codec = "opus" # Audio codec
+audio_codec = "m4a" # Audio codec
 original_quality = True # Set to True to use original quality (no encoding)
 
 
