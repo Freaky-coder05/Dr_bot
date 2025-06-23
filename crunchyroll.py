@@ -423,7 +423,8 @@ class CrunchyrollAuth(CrunchyrollBase):
 
     def get_user_token(self, email, password):
         endpoint = "https://www.crunchyroll.com/auth/v1/token"
-        authorization_header = "Basic Y3J1bmNoeV9hbmRyb2lkOldWN0Q3RDNQNzNaWFNYQldERzRNOEVLVw=="  # Replace with valid
+         
+        authorization_header = "Basic Y3J1bmNoeV9hbmRyb2lkOldWN0Q3RDNQNzNaWFNYQldERzRNOEVLVw==""  # Replace with valid
 
         self.set_headers({
             'Authorization': authorization_header,
