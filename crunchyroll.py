@@ -388,7 +388,7 @@ def get_segment_link_list(mpd_content, representation_id, url):
 
 class CrunchyrollAuth(CrunchyrollBase):
     
-    def select_profile(self, token, target_profile_name="blackm"):
+    def select_profile(self, token, target_profile_name="joevaas"):
         url = "https://www.crunchyroll.com/accounts/v1/me/profiles"
         headers = {
             "Authorization": f"Bearer {token}",
