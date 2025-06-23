@@ -423,43 +423,40 @@ class CrunchyrollAuth(CrunchyrollBase):
 
     def get_user_token(self, email, password):
         endpoint = "https://www.crunchyroll.com/auth/v1/token"
-        authorization_header = "Basic ZG1yeWZlc2NkYm90dWJldW56NXo6NU45aThPV2cyVmtNcm1oekNfNUNXekRLOG55SXo0QU0="
-        content_type_header = "application/x-www-form-urlencoded"
-        etp_anonymous_id_header = str(uuid.uuid4())
+        authorization_header = "Basic Y3J1bmNoeV9hbmRyb2lkOldWN0Q3RDNQNzNaWFNYQldERzRNOEVLVw=="  # Replace with valid
 
         self.set_headers({
             'Authorization': authorization_header,
-            'Connection': 'Keep-Alive',
-            'Content-Type': content_type_header,
-            'ETP-Anonymous-ID': etp_anonymous_id_header,
-            'Host': 'www.crunchyroll.com',
-            'User-Agent': Miscellaneous().randomize_user_agent(),
-            'X-Datadog-Sampling-Priority': '0',
+            'Content-Type': 'application/json',
+            'ETP-Anonymous-ID': str(uuid.uuid4()),
+            'User-Agent': 'Crunchyroll/3.40.0 Android/11',
         })
 
         data = {
-            "username": email,
-            "password": password,
-            "grant_type": "password",
-            "scope": "offline_access",
-            "device_id": str(uuid.uuid4()),
-            "device_type": "Google sdk_gphone64_x86_64"
+        "username": email,
+        "password": password,
+        "grant_type": "password",
+        "scope": "offline_access",
+        "device_id": str(uuid.uuid4()),
+        "device_type": "Google sdk_gphone64_x86_64"
         }
-        if use_proxy:
-            auth_response = self.session.post(endpoint, data=data, proxy=proxy)
-        else:
-            auth_response = self.session.post(endpoint, data=data)
-        if auth_response.status_code != 200:
-            print("Error: Failed to authenticate with Crunchyroll")
-            print("Response:", auth_response.text)
-            return
 
-        auth_response_payload = auth_response.json()
-        access_token = auth_response_payload.get("access_token", "")
-        if not access_token:
-            print("Error: Access token not received")
+        try:
+            auth_response = self.session.post(endpoint, json=data)
+            if auth_response.status_code != 200:
+                print("❌ Login failed!")
+                print("Status Code:", auth_response.status_code)
+                print("Response JSON:", auth_response.json())
+                return
+
+            access_token = auth_response.json().get("access_token")
+            if not access_token:
+                print("❌ Access token not received!")
+                return
+            return access_token
+        except Exception as e:
+            print("❌ Exception occurred during login:", e)
             return
-        return access_token
 
 def get_filter_complex():
     
