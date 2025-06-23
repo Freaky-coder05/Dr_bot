@@ -421,17 +421,17 @@ class CrunchyrollAuth(CrunchyrollBase):
             return
         return access_token
 
+    
+
     def get_user_token(self, email, password):
         endpoint = "https://www.crunchyroll.com/auth/v1/token"
-         
-        authorization_header = "Basic Y3J1bmNoeV9hbmRyb2lkOldWN0Q3RDNQNzNaWFNYQldERzRNOEVLVw=="  # Replace with valid
-
-        self.set_headers({
-            'Authorization': authorization_header,
-            'Content-Type': 'application/json',
-            'ETP-Anonymous-ID': str(uuid.uuid4()),
-            'User-Agent': 'Crunchyroll/3.40.0 Android/11',
-        })
+        authorization_header = "Basic Y3J1bmNoeV9hbmRyb2lkOldWN0Q3RDNQNzNaWFNYQldERzRNOEVLVw=="  # ✅ Valid
+        headers = {
+        'Authorization': authorization_header,
+        'Content-Type': 'application/json',
+        'ETP-Anonymous-ID': str(uuid.uuid4()),
+        'User-Agent': 'Crunchyroll/3.40.0 Android/11',
+        }
 
         data = {
         "username": email,
@@ -443,21 +443,25 @@ class CrunchyrollAuth(CrunchyrollBase):
         }
 
         try:
-            auth_response = self.session.post(endpoint, json=data)
+            auth_response = self.session.post(endpoint, json=data, headers=headers)
+            print("Status Code:", auth_response.status_code)
+            print("Response JSON:", auth_response.text)
+
             if auth_response.status_code != 200:
                 print("❌ Login failed!")
-                print("Status Code:", auth_response.status_code)
-                print("Response JSON:", auth_response.json())
-                return
+                return None
 
-            access_token = auth_response.json().get("access_token")
-            if not access_token:
-                print("❌ Access token not received!")
-                return
-            return access_token
+            token = auth_response.json().get("access_token")
+            if not token:
+                print("❌ Access token not received")
+                return None
+
+            print("✅ Premium token obtained")
+            return token
+
         except Exception as e:
-            print("❌ Exception occurred during login:", e)
-            return
+            print("❌ Exception:", e)
+            return None
 
 def get_filter_complex():
     
