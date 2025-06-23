@@ -5,7 +5,6 @@ import re
 import os
 import shlex
 from config import *
-import logging
 
 
 
@@ -13,39 +12,28 @@ import logging
 hard_subtitle = None
 
 
-
-# ✅ Optional: Setup logging if debug mode is on
-if debug:
-    logging.basicConfig(level=level)
-
-# ✅ Start Authentication
+if debug: 
+   import logging
+   logging.basicConfig(level=level)
 auth = CrunchyrollAuth()
-
-# ✅ Use account login (premium) or fallback to guest
 if use_account:
     if not Email or not Password:
-        print("❌ Please enter your email and password in the config.py file.")
+        print("Please enter your email and password in the config.py file")
         exit()
-
     vid_token = auth.get_user_token(Email, Password)
     if not vid_token:
-        print("❌ Premium login failed. Please check your credentials or client ID/secret.")
+        print("Invalid email or password")
         exit()
-    else:
-        print("✅ Premium login successful.")
+    profile_id = auth.select_profile(vid_token, target_profile_name="blackm")
+    if not profile_id:
+        print("Profile 'blackm' not found or not accessible.")
+        exit()
+    crunchyroll = Crunchyroll(vid_token, profile_id)
 else:
     vid_token = auth.get_guest_token()
-    if not vid_token:
-        print("❌ Guest token fetch failed.")
-        exit()
-    else:
-        print("✅ Guest login successful.")
+    crunchyroll = Crunchyroll(vid_token)
+video_url = input("Enter the Crunchyroll video URL: ")
 
-# ✅ Initialize Crunchyroll with token
-crunchyroll = Crunchyroll(vid_token)
-
-# ✅ Get input from user
-video_url = input("🎥 Enter the Crunchyroll video URL: ")
 
 if "watch" in video_url:
     match = re.search(r'"?https?://www\.crunchyroll\.com/(?:watch)/([^/"]+)', video_url)
