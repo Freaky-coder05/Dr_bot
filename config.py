@@ -14,7 +14,7 @@ BOT_TOKEN = "7662286847:AAGJIoqoUHsHcoj4RD8fWJqUNFD-2hepQTY" # Replace with your
 # --- User Management & Limits ---
 sudo_users = [6693549185] # List of sudo user IDs (as integers)
 premium_users = [] # List of premium user IDs (as integers)
-AUTHORIZED_USERS = [7177667220,6299192020] # List of authorized user IDs to use bot in private (as integers)
+AUTHORIZED_USERS = [7177667220,6299192020,6121610691] # List of authorized user IDs to use bot in private (as integers)
 
 # Limits for regular users
 REGULAR_USER_AUDIO_LIMIT = 5
