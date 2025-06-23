@@ -228,7 +228,7 @@ def convert_vtt_to_srt_custom(vtt_path, srt_path):
     with open(srt_path, "w", encoding="utf-8") as srt_file:
         srt_file.write("\n".join(srt_lines))
 
-    print(f"✅ Converted: {vtt_path} -> {srt_path}")
+    print(f"âœ… Converted: {vtt_path} -> {srt_path}")
 
 def parse_mpd_content(mpd_content):
     if isinstance(mpd_content, str):
@@ -387,6 +387,27 @@ def get_segment_link_list(mpd_content, representation_id, url):
             return {}
 
 class CrunchyrollAuth(CrunchyrollBase):
+    
+    def select_profile(self, token, target_profile_name="blackm"):
+        url = "https://www.crunchyroll.com/accounts/v1/me/profiles"
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "User-Agent": Miscellaneous().randomize_user_agent()
+        }
+        response = self.session.get(url, headers=headers)
+        if response.status_code != 200:
+            print("âŒ Failed to fetch profiles.")
+            return None
+
+        profiles = response.json().get("items", [])
+        for profile in profiles:
+            if profile["name"].lower() == target_profile_name.lower():
+                print(f"âœ… Using profile: {profile['name']}")
+                return profile["profile_id"]
+
+        print("âŒ Profile not found.")
+        return None
+
     def get_guest_token(self):
         endpoint = "https://www.crunchyroll.com/auth/v1/token"
         authorization_header = "Basic Y3Jfd2ViOg=="
@@ -421,47 +442,45 @@ class CrunchyrollAuth(CrunchyrollBase):
             return
         return access_token
 
-    
-
     def get_user_token(self, email, password):
         endpoint = "https://www.crunchyroll.com/auth/v1/token"
-        authorization_header = "Basic Y3J1bmNoeV9hbmRyb2lkOldWN0Q3RDNQNzNaWFNYQldERzRNOEVLVw=="  # ✅ Valid
-        headers = {
-        'Authorization': authorization_header,
-        'Content-Type': 'application/json',
-        'ETP-Anonymous-ID': str(uuid.uuid4()),
-        'User-Agent': 'Crunchyroll/3.40.0 Android/11',
-        }
+        authorization_header = "Basic Y3J1bmNoeV9hbmRyb2lkOldWN0Q3RDNQNzNaWFNYQldERzRNOEVLVw=="
+        content_type_header = "application/x-www-form-urlencoded"
+        etp_anonymous_id_header = str(uuid.uuid4())
+
+        self.set_headers({
+            'Authorization': authorization_header,
+            'Connection': 'Keep-Alive',
+            'Content-Type': content_type_header,
+            'ETP-Anonymous-ID': etp_anonymous_id_header,
+            'Host': 'www.crunchyroll.com',
+            'User-Agent': Miscellaneous().randomize_user_agent(),
+            'X-Datadog-Sampling-Priority': '0',
+        })
 
         data = {
-        "username": email,
-        "password": password,
-        "grant_type": "password",
-        "scope": "offline_access",
-        "device_id": str(uuid.uuid4()),
-        "device_type": "Google sdk_gphone64_x86_64"
+            "username": email,
+            "password": password,
+            "grant_type": "password",
+            "scope": "offline_access",
+            "device_id": str(uuid.uuid4()),
+            "device_type": "Google sdk_gphone64_x86_64"
         }
+        if use_proxy:
+            auth_response = self.session.post(endpoint, data=data, proxy=proxy)
+        else:
+            auth_response = self.session.post(endpoint, data=data)
+        if auth_response.status_code != 200:
+            print("Error: Failed to authenticate with Crunchyroll")
+            print("Response:", auth_response.text)
+            return
 
-        try:
-            auth_response = self.session.post(endpoint, json=data, headers=headers)
-            print("Status Code:", auth_response.status_code)
-            print("Response JSON:", auth_response.text)
-
-            if auth_response.status_code != 200:
-                print("❌ Login failed!")
-                return None
-
-            token = auth_response.json().get("access_token")
-            if not token:
-                print("❌ Access token not received")
-                return None
-
-            print("✅ Premium token obtained")
-            return token
-
-        except Exception as e:
-            print("❌ Exception:", e)
-            return None
+        auth_response_payload = auth_response.json()
+        access_token = auth_response_payload.get("access_token", "")
+        if not access_token:
+            print("Error: Access token not received")
+            return
+        return access_token
 
 def get_filter_complex():
     
@@ -475,7 +494,21 @@ def get_filter_complex():
     )
 
 class Crunchyroll(CrunchyrollBase):
-    def __init__(self, token):
+    def __init__(self, token, profile_id=None):
+        super().__init__()
+        headers = {
+            'authorization': f"Bearer {token}",
+            'connection': 'Keep-Alive',
+            'content-type': 'application/x-www-form-urlencoded',
+            'etp-anonymous-id': str(uuid.uuid4()),
+            'host': 'www.crunchyroll.com',
+            'user-agent': Miscellaneous().randomize_user_agent(),
+            'x-datadog-sampling-priority': '0',
+        }
+        if profile_id:
+            headers['x-cr-profile-id'] = profile_id
+        self.set_headers(headers)
+
         super().__init__()
         self.set_headers({
             'authorization': f"Bearer {token}",
@@ -563,4 +596,3 @@ def find_guid_by_locale(data, locale):
         if version["audio_locale"] == "en-US":
             en_us_guid = version["guid"]
     return en_us_guid
-
