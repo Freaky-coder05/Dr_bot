@@ -17,7 +17,7 @@ if debug:
    logging.basicConfig(level=level)
 auth = CrunchyrollAuth()
 if use_account:
-    if Email == "" or Password == "":
+    if not Email or not Password:
         print("Please enter your email and password in the config.py file")
         exit()
     vid_token = auth.get_user_token(Email, Password)
