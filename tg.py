@@ -36,7 +36,7 @@ try:
         audio_codec = "aac"
     if original_quality:
        encoding_code = "copy"
-       audio_codec = "opus"
+       audio_codec = "libopus"
        use_watermark = False
     
 
