@@ -36,7 +36,7 @@ try:
         audio_codec = "aac"
     if original_quality:
        encoding_code = "copy"
-       audio_codec = "libopus"
+       audio_codec = "copy"
        use_watermark = False
     
 
@@ -1281,8 +1281,7 @@ def download_decrypt_merge_single(
         ffmpeg_cmd_list.extend(metadata_commands)
         ffmpeg_cmd_list.extend([
             "-c:v", encoding_code, 
-            "-c:a", audio_codec,
-            "-b:a", "32k",   
+            "-c:a", audio_codec,  
             "-c:s", "copy",        
             output_filename
         ])
