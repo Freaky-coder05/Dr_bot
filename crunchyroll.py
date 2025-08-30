@@ -543,22 +543,46 @@ class Crunchyroll(CrunchyrollBase):
     
 
     def get_pssh(self, info):
+    # Try to locate the MPD URL in different possible response formats
+        mpd_url = None
+        if "url" in info:
+            mpd_url = info["url"]
+        elif "streams" in info and "adaptive_dash" in info["streams"]:
+            mpd_url = info["streams"]["adaptive_dash"].get("url")
+        elif "data" in info and isinstance(info["data"], list):
+            try:
+                mpd_url = info["data"][0]["streams"]["adaptive_dash"].get("url")
+            except Exception:
+                pass
+
+        if not mpd_url:
+            raise ValueError(f"No MPD URL found in info: {info}")
+
+    # Fetch the MPD file (with/without proxy)
         if use_proxy:
-            mpd_content = self.session.get(info["url"], proxy=proxy).text
+            mpd_content = self.session.get(mpd_url, proxy=proxy).text
         else:
-            mpd_content = self.session.get(info["url"]).text
+            mpd_content = self.session.get(mpd_url).text
+
         mpd_license = parse_mpd_logic(mpd_content)
-        pssh = mpd_license["pssh"][1]
-        token = info["token"]
+
+    # Ensure pssh exists and pick the first one safely
+        pssh_list = mpd_license.get("pssh", [])
+        if not pssh_list:
+            raise ValueError(f"No PSSH found in MPD: {mpd_content[:200]}...")
+
+        pssh = pssh_list[0] if len(pssh_list) == 1 else pssh_list[1]
+        token = info.get("token")
+
         return pssh, mpd_content, token
 
-def find_guid_by_locale(data, locale):
+    def find_guid_by_locale(data, locale):
     """Find the GUID for the specified locale, fallback to en-US if not found"""
-    en_us_guid = None
-    for version in data["versions"]:
-        if version["audio_locale"] == locale:
-            return version["guid"]
-        if version["audio_locale"] == "en-US":
-            en_us_guid = version["guid"]
-    return en_us_guid
+        en_us_guid = None
+        for version in data["versions"]:
+            if version["audio_locale"] == locale:
+                return version["guid"]
+            if version["audio_locale"] == "en-US":
+                en_us_guid = version["guid"]
+        return en_us_guid
 
