@@ -9,7 +9,7 @@ Password = "Augusto3232" #Your password here
 # --- Telegram Settings ---
 API_ID = 25797857  # Replace with your API ID
 API_HASH = "77717127ece56fac64ebea6250db8bb7" # Replace with your API Hash
-BOT_TOKEN = "" # Replace with your Bot Token
+BOT_TOKEN = "7662286847:AAEq60Of9YLDHgKmLFCD844I2JT0bI2mBgk" # Replace with your Bot Token
 
 # --- User Management & Limits ---
 sudo_users = [6693549185] # List of sudo user IDs (as integers)
@@ -264,6 +264,7 @@ LANGUAGE_NAME_TO_ISO639_2B = {
     "Yoruba": "yor",
     "Zulu": "zul"
 }
+
 
 
 
