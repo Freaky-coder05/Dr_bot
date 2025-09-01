@@ -35,7 +35,7 @@ retry_delay = 2 # seconds
 #proxy settings
 
 use_proxy = True # Set to True to use a proxy
-proxy = "http://13.201.214.73:8080" # Proxy URL (e.g., "http://username:password@proxyserver:port")
+proxy = "http://64.227.134.174:3128" # Proxy URL (e.g., "http://username:password@proxyserver:port")
 
 # watermark settings
 Watermark_Name = "ToonTamilIndia" # Your watermark name here
@@ -264,6 +264,7 @@ LANGUAGE_NAME_TO_ISO639_2B = {
     "Yoruba": "yor",
     "Zulu": "zul"
 }
+
 
 
 
