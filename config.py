@@ -3,7 +3,7 @@ if you want to use an account, set use_account to True and fill in the email and
 if you want to use a guest account, set use_account to False and leave email and password empty.
 '''
 use_account = True
-Email = "stelviocarlos93@outlook.com" #Your email here
+Email = "stelvios93@outlook.com" #Your email here
 Password = "@Stream12345" #Your password here
 
 # --- Telegram Settings ---
@@ -264,6 +264,7 @@ LANGUAGE_NAME_TO_ISO639_2B = {
     "Yoruba": "yor",
     "Zulu": "zul"
 }
+
 
 
 
