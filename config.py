@@ -3,8 +3,8 @@ if you want to use an account, set use_account to True and fill in the email and
 if you want to use a guest account, set use_account to False and leave email and password empty.
 '''
 use_account = True
-Email = "stelviocarlos93@outlook.com" #Your email here
-Password = "@Stream12345" #Your password here
+Email = "michaelcapers1145@gmail.com" #Your email here
+Password = "iuyt77665544" #Your password here
 
 # --- Telegram Settings ---
 API_ID = 25797857  # Replace with your API ID
@@ -264,6 +264,7 @@ LANGUAGE_NAME_TO_ISO639_2B = {
     "Yoruba": "yor",
     "Zulu": "zul"
 }
+
 
 
 
