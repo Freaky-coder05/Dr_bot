@@ -4,7 +4,7 @@ if you want to use a guest account, set use_account to False and leave email and
 '''
 use_account = True
 Email = "ltandel44@gmail.com" #Your email here
-Password = "Lucky@22030" #Your password here
+Password = "Lucky@220307" #Your password here
 
 # --- Telegram Settings ---
 API_ID = 25797857  # Replace with your API ID
@@ -264,6 +264,7 @@ LANGUAGE_NAME_TO_ISO639_2B = {
     "Yoruba": "yor",
     "Zulu": "zul"
 }
+
 
 
 
