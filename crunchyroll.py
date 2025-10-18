@@ -570,7 +570,7 @@ class Crunchyroll(CrunchyrollBase):
         return pssh, mpd_content, token
 
     def find_guid_by_locale(data, locale):
-    """Find the GUID for the specified locale, fallback to en-US if not found"""
+        """Find the GUID for the specified locale, fallback to en-US if not found"""
         en_us_guid = None
         for version in data["versions"]:
             if version["audio_locale"] == locale:
