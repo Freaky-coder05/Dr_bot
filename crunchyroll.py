@@ -386,8 +386,9 @@ def get_segment_link_list(mpd_content, representation_id, url):
 
 class CrunchyrollAuth(CrunchyrollBase):
     def get_guest_token(self):
+        """Obtain a working guest token (no login required)."""
         endpoint = "https://www.crunchyroll.com/auth/v1/token"
-        authorization_header = "Basic Y3Jfd2ViOg=="
+        authorization_header = "Basic Y3Jfd2ViOg=="  # Guest client ID
         content_type_header = "application/x-www-form-urlencoded"
         etp_anonymous_id_header = str(uuid.uuid4())
 
@@ -402,22 +403,32 @@ class CrunchyrollAuth(CrunchyrollBase):
         })
 
         data = {"grant_type": "client_id"}
-        if use_proxy:
-            auth_response = self.session.post(endpoint, data=data, proxy=proxy)
-        else:
-            auth_response = self.session.post(endpoint, data=data)
 
-        if auth_response.status_code != 200:
-            print("Error: Failed to authenticate with Crunchyroll")
-            print("Response:", auth_response.text)
-            return
+        try:
+            if use_proxy:
+                auth_response = self.session.post(endpoint, data=data, proxy=proxy)
+            else:
+                auth_response = self.session.post(endpoint, data=data)
 
-        auth_response_payload = auth_response.json()
-        access_token = auth_response_payload.get("access_token", "")
-        if not access_token:
-            print("Error: Access token not received")
-            return
-        return access_token
+            if auth_response.status_code != 200:
+                print("❌ Error: Failed to authenticate with Crunchyroll (guest mode)")
+                print("Response:", auth_response.text)
+                return None
+
+            token_data = auth_response.json()
+            access_token = token_data.get("access_token")
+            if not access_token:
+                print("❌ Error: No access_token found in guest response:", token_data)
+                return None
+
+            print("✅ Crunchyroll Guest Authentication successful.")
+            return access_token
+
+        except Exception as e:
+            print(f"❌ Exception while getting guest token: {e}")
+            return None
+
+    
 
     def get_user_token(self, email, password):
         endpoint = "https://www.crunchyroll.com/auth/v1/token"
@@ -541,22 +552,30 @@ class Crunchyroll(CrunchyrollBase):
     
 
     def get_pssh(self, info):
-        if use_proxy:
-            mpd_content = self.session.get(info["url"], proxy=proxy).text
-        else:
-            mpd_content = self.session.get(info["url"]).text
+        streams = info.get("data", {}).get("streams", {})
+        adaptive_dash = streams.get("adaptive_dash", {})
+        url = adaptive_dash.get("url")
+        token = adaptive_dash.get("drm", {}).get("token")
+
+        if not url:
+            raise KeyError("No MPD URL found in video info")
+
+        mpd_content = self.session.get(url).text
         mpd_license = parse_mpd_logic(mpd_content)
-        pssh = mpd_license["pssh"][1]
-        token = info["token"]
+        pssh_list = mpd_license.get("pssh", [])
+        if not pssh_list:
+            raise ValueError("No PSSH data found in MPD")
+
+        pssh = pssh_list[0]
         return pssh, mpd_content, token
 
-def find_guid_by_locale(data, locale):
+    def find_guid_by_locale(data, locale):
     """Find the GUID for the specified locale, fallback to en-US if not found"""
-    en_us_guid = None
-    for version in data["versions"]:
-        if version["audio_locale"] == locale:
-            return version["guid"]
-        if version["audio_locale"] == "en-US":
-            en_us_guid = version["guid"]
-    return en_us_guid
+        en_us_guid = None
+        for version in data["versions"]:
+            if version["audio_locale"] == locale:
+                return version["guid"]
+            if version["audio_locale"] == "en-US":
+                en_us_guid = version["guid"]
+        return en_us_guid
 
